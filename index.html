@@ -10,8 +10,9 @@
 <title>bloom. — personal budget</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
 <style>
-  :root { 
+  :root {
     --bg: #FFF5F7;
     --bg2: #FADADD;
     --bg3: #F5D6DE;
@@ -45,11 +46,93 @@
     overflow-x: hidden;
   }
 
-  /* UTILITY */
   .hidden { display: none !important; }
   .green { color: var(--green); }
   .pink-dark { color: var(--pink-dark); }
   .muted { color: var(--pink-muted); }
+
+  /* LOGIN SCREEN */
+  #login-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 32px;
+    background: var(--bg);
+  }
+  .login-logo {
+    font-family: var(--font-display);
+    font-size: 48px;
+    color: var(--pink-text);
+    margin-bottom: 8px;
+    letter-spacing: -1px;
+  }
+  .login-tagline {
+    font-size: 14px;
+    color: var(--pink-muted);
+    margin-bottom: 48px;
+    letter-spacing: 0.04em;
+  }
+  .login-card {
+    background: var(--white);
+    border-radius: 20px;
+    border: 0.5px solid var(--bg3);
+    padding: 28px 24px;
+    width: 100%;
+    box-shadow: var(--shadow);
+  }
+  .login-label {
+    font-size: 11px;
+    color: var(--pink-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .login-input {
+    width: 100%;
+    padding: 13px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--bg3);
+    background: var(--bg);
+    font-family: var(--font);
+    font-size: 15px;
+    color: var(--pink-text);
+    outline: none;
+    transition: border 0.15s;
+    margin-bottom: 16px;
+  }
+  .login-input:focus { border-color: var(--pink); }
+  .login-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--pink);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    margin-top: 4px;
+  }
+  .login-btn:hover { background: var(--pink-dark); }
+  .login-btn:active { transform: scale(0.98); }
+  .login-error {
+    font-size: 13px;
+    color: var(--pink-dark);
+    text-align: center;
+    margin-top: 12px;
+    min-height: 20px;
+  }
+  .login-flowers {
+    margin-top: 40px;
+    font-size: 24px;
+    letter-spacing: 8px;
+    opacity: 0.4;
+  }
 
   /* SCREENS */
   .screen { display: none; flex-direction: column; min-height: 100vh; padding-bottom: 80px; animation: fadeUp 0.2s ease; }
@@ -70,13 +153,6 @@
     border: none; font-family: var(--font);
   }
   .month-pill:hover { background: var(--bg3); }
-  .icon-btn {
-    width: 36px; height: 36px; border-radius: 50%;
-    background: var(--bg2); border: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--pink-muted);
-  }
-  .icon-btn:hover { background: var(--bg3); }
 
   /* SECTION LABEL */
   .sec-label {
@@ -93,10 +169,7 @@
     letter-spacing: -2px; line-height: 1; margin-bottom: 16px;
   }
   .hero-amount .cents { font-size: 28px; color: var(--pink-muted); }
-  .hero-stats {
-    display: flex; background: var(--bg2); border-radius: var(--radius);
-    overflow: hidden;
-  }
+  .hero-stats { display: flex; background: var(--bg2); border-radius: var(--radius); overflow: hidden; }
   .h-stat { flex: 1; padding: 12px 14px; }
   .h-stat + .h-stat { border-left: 0.5px solid var(--bg3); }
   .h-stat-label { font-size: 10px; color: var(--pink-deep); margin-bottom: 3px; letter-spacing: 0.04em; text-transform: uppercase; }
@@ -147,7 +220,6 @@
   .bc-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
   .bc-bar { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.4s ease; }
   .bc-label { font-size: 10px; color: var(--pink-muted); }
-  .bc-val { font-size: 9px; color: var(--pink-muted); }
 
   /* DONUT */
   .donut-wrap { display: flex; align-items: center; gap: 20px; }
@@ -184,14 +256,14 @@
     margin-top: -24px; box-shadow: 0 4px 16px rgba(237,147,177,0.4);
     transition: transform 0.15s, box-shadow 0.15s;
   }
-  .fab-btn:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(237,147,177,0.5); }
+  .fab-btn:hover { transform: scale(1.05); }
   .fab-btn:active { transform: scale(0.96); }
 
   /* MODAL */
   .modal-overlay {
     position: fixed; inset: 0; background: rgba(61,26,42,0.3);
     z-index: 200; display: flex; align-items: flex-end;
-    justify-content: center; padding: 0;
+    justify-content: center;
     animation: fadeIn 0.15s ease;
   }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -242,6 +314,10 @@
     font-size: 10px; background: var(--bg2); color: var(--pink-deep);
     padding: 2px 8px; border-radius: 10px; margin-left: 6px;
   }
+  .plaid-badge {
+    font-size: 10px; background: #E6F1FB; color: #185FA5;
+    padding: 2px 8px; border-radius: 10px; margin-left: 6px;
+  }
 
   /* SETTINGS */
   .settings-row {
@@ -289,29 +365,22 @@
   }
   .filter-tab.active { background: var(--pink); color: white; border-color: var(--pink); }
 
-  /* PROGRESS RING */
-  .progress-ring { position: relative; display: inline-flex; }
-  .progress-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-
   /* SCROLL AREA */
   .scroll-area { flex: 1; overflow-y: auto; padding: 16px 20px; }
   .scroll-area::-webkit-scrollbar { display: none; }
-
-  /* SECTION SPACING */
   .section-block { margin-bottom: 20px; }
 
-  /* AMOUNT INPUT WRAPPER */
+  /* AMOUNT INPUT */
   .amount-wrap { position: relative; }
   .amount-prefix { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--pink-muted); font-size: 15px; }
   .amount-wrap .form-input { padding-left: 26px; }
 
-  /* CATEGORY EMOJI GRID */
+  /* EMOJI GRID */
   .emoji-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 8px; }
   .emoji-btn {
     aspect-ratio: 1; border-radius: var(--radius-xs); background: var(--bg);
     border: 1px solid var(--bg3); font-size: 20px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; transition: all 0.15s;
   }
   .emoji-btn:hover, .emoji-btn.selected { background: var(--bg2); border-color: var(--pink); }
 
@@ -320,18 +389,35 @@
     position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
     background: var(--pink-text); color: white; padding: 10px 20px;
     border-radius: 20px; font-size: 13px; font-weight: 500;
-    z-index: 500; animation: toastIn 0.2s ease;
-    white-space: nowrap;
+    z-index: 500; animation: toastIn 0.2s ease; white-space: nowrap;
   }
   @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
 
-  /* OVERVIEW SPECIFIC */
-  .overview-hero-wrap { padding: 16px 20px 0; }
+  /* PLAID CONNECT BANNER */
+  .plaid-banner {
+    background: #E6F1FB; border-radius: var(--radius); padding: 14px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px; border: 0.5px solid #B5D4F4;
+  }
+  .plaid-banner-text { font-size: 13px; color: #185FA5; font-weight: 500; }
+  .plaid-banner-sub { font-size: 11px; color: #378ADD; margin-top: 2px; }
+  .plaid-connect-btn {
+    background: #378ADD; color: white; border: none; border-radius: var(--radius-sm);
+    padding: 8px 16px; font-size: 13px; font-weight: 500; cursor: pointer;
+    font-family: var(--font); white-space: nowrap; flex-shrink: 0;
+    transition: background 0.15s;
+  }
+  .plaid-connect-btn:hover { background: #185FA5; }
 
-  /* PAGE PADDING TOP */
-  .page-pad { padding-top: 16px; }
+  /* SYNC STATUS */
+  .sync-row {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: var(--pink-muted); margin-bottom: 12px;
+  }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+  .sync-dot.disconnected { background: var(--bg3); }
 
-  /* INSIGHTS */
+  /* INSIGHT CARD */
   .insight-card {
     background: linear-gradient(135deg, #FADADD 0%, #FBEAF0 100%);
     border-radius: var(--radius); padding: 16px; margin-bottom: 10px;
@@ -339,242 +425,282 @@
   }
   .insight-title { font-size: 13px; font-weight: 500; color: var(--pink-deep); margin-bottom: 4px; }
   .insight-body { font-size: 12px; color: var(--pink-muted); line-height: 1.5; }
+
+  .page-pad { padding-top: 16px; }
 </style>
 </head>
 <body>
 
-<!-- OVERVIEW SCREEN -->
-<div id="screen-overview" class="screen active">
-  <div class="topbar">
-    <span class="logo">bloom.</span>
-    <button class="month-pill" onclick="openMonthPicker()">
-      <span id="overview-month-label">April 2026</span>
-    </button>
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-logo">bloom.</div>
+  <div class="login-tagline">your personal budget</div>
+  <div class="login-card">
+    <label class="login-label">username</label>
+    <input type="text" id="login-username" class="login-input" placeholder="username" autocomplete="username">
+    <label class="login-label">password</label>
+    <input type="password" id="login-password" class="login-input" placeholder="••••••••" autocomplete="current-password">
+    <button class="login-btn" onclick="doLogin()">Sign in</button>
+    <div class="login-error" id="login-error"></div>
   </div>
-  <div class="scroll-area page-pad">
+  <div class="login-flowers">🌸 🌷 🌸</div>
+</div>
 
-    <!-- Hero Balance -->
-    <div class="section-block">
-      <div class="hero-label">left to spend</div>
-      <div class="hero-amount" id="hero-balance">$0<span class="cents">.00</span></div>
-      <div class="hero-stats">
-        <div class="h-stat">
-          <div class="h-stat-label">income</div>
-          <div class="h-stat-val green" id="hero-income">$0</div>
-        </div>
-        <div class="h-stat">
-          <div class="h-stat-label">spent</div>
-          <div class="h-stat-val pink-dark" id="hero-spent">$0</div>
-        </div>
-        <div class="h-stat">
-          <div class="h-stat-label">saved</div>
-          <div class="h-stat-val" id="hero-saved">$0</div>
+<!-- MAIN APP (hidden until logged in) -->
+<div id="app" class="hidden">
+
+  <!-- OVERVIEW SCREEN -->
+  <div id="screen-overview" class="screen active">
+    <div class="topbar">
+      <span class="logo">bloom.</span>
+      <button class="month-pill" onclick="openMonthPicker()">
+        <span id="overview-month-label">April 2026</span>
+      </button>
+    </div>
+    <div class="scroll-area page-pad">
+      <div class="section-block" id="plaid-banner-block">
+        <div class="plaid-banner" id="plaid-connect-banner">
+          <div>
+            <div class="plaid-banner-text">Connect your bank</div>
+            <div class="plaid-banner-sub">Sync transactions from MACU automatically</div>
+          </div>
+          <button class="plaid-connect-btn" onclick="openPlaidLink()">Connect</button>
         </div>
       </div>
-    </div>
 
-    <!-- Budget Goals -->
-    <div class="section-block">
-      <div class="sec-label">budget goals</div>
-      <div class="card" id="budget-bars-container">
-        <div class="empty-state" id="budget-empty">
-          <div class="empty-icon">🎯</div>
-          <p>No budget goals yet.<br>Add one in the Settings tab.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Spending Chart -->
-    <div class="section-block">
-      <div class="sec-label">spending — last 6 months</div>
-      <div class="card">
-        <div class="chart-wrap">
-          <div class="bar-chart-h" id="spending-chart"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Category Breakdown -->
-    <div class="section-block">
-      <div class="sec-label">by category this month</div>
-      <div class="card">
-        <div class="donut-wrap">
-          <svg width="90" height="90" viewBox="0 0 90 90" id="donut-svg">
-            <circle cx="45" cy="45" r="35" fill="none" stroke="#FADADD" stroke-width="14"/>
-          </svg>
-          <div class="donut-legend" id="donut-legend">
-            <div style="font-size:12px;color:var(--pink-muted);">Add transactions to see breakdown</div>
+      <div class="section-block">
+        <div class="hero-label">left to spend</div>
+        <div class="hero-amount" id="hero-balance">$0<span class="cents">.00</span></div>
+        <div class="hero-stats">
+          <div class="h-stat">
+            <div class="h-stat-label">income</div>
+            <div class="h-stat-val green" id="hero-income">$0</div>
+          </div>
+          <div class="h-stat">
+            <div class="h-stat-label">spent</div>
+            <div class="h-stat-val pink-dark" id="hero-spent">$0</div>
+          </div>
+          <div class="h-stat">
+            <div class="h-stat-label">saved</div>
+            <div class="h-stat-val" id="hero-saved">$0</div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Recent Transactions -->
-    <div class="section-block">
-      <div class="sec-label">recent transactions</div>
-      <div class="card" id="recent-tx-list">
+      <div class="section-block">
+        <div class="sec-label">budget goals</div>
+        <div class="card" id="budget-bars-container">
+          <div class="empty-state">
+            <div class="empty-icon">🎯</div>
+            <p>No budget goals yet.<br>Add one in the Settings tab.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <div class="sec-label">spending — last 6 months</div>
+        <div class="card">
+          <div class="chart-wrap">
+            <div class="bar-chart-h" id="spending-chart"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <div class="sec-label">by category this month</div>
+        <div class="card">
+          <div class="donut-wrap">
+            <svg width="90" height="90" viewBox="0 0 90 90" id="donut-svg">
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#FADADD" stroke-width="14"/>
+            </svg>
+            <div class="donut-legend" id="donut-legend">
+              <div style="font-size:12px;color:var(--pink-muted);">Add transactions to see breakdown</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <div class="sec-label">recent transactions</div>
+        <div class="card" id="recent-tx-list">
+          <div class="empty-state">
+            <div class="empty-icon">✨</div>
+            <p>No transactions yet.<br>Tap + to add one or connect your bank.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-block" id="insights-block" style="display:none;">
+        <div class="sec-label">insights</div>
+        <div id="insights-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRANSACTIONS SCREEN -->
+  <div id="screen-transactions" class="screen">
+    <div class="topbar">
+      <span class="logo">bloom.</span>
+      <button class="month-pill" onclick="openMonthPicker()">
+        <span id="tx-month-label">April 2026</span>
+      </button>
+    </div>
+    <div class="scroll-area page-pad">
+      <div class="sync-row" id="sync-status-row">
+        <div class="sync-dot disconnected" id="sync-dot"></div>
+        <span id="sync-status-text">Bank not connected</span>
+        <button onclick="syncTransactions()" style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:12px;color:var(--pink);font-family:var(--font);font-weight:500;" id="sync-btn" class="hidden">Sync now</button>
+      </div>
+      <div class="filter-tabs" id="filter-tabs">
+        <button class="filter-tab active" onclick="setFilter('all',this)">All</button>
+        <button class="filter-tab" onclick="setFilter('income',this)">Income</button>
+        <button class="filter-tab" onclick="setFilter('expense',this)">Expenses</button>
+        <button class="filter-tab" onclick="setFilter('plaid',this)">From bank</button>
+      </div>
+      <div id="tx-list-full">
         <div class="empty-state">
-          <div class="empty-icon">✨</div>
-          <p>No transactions yet.<br>Tap + to add your first one.</p>
+          <div class="empty-icon">📋</div>
+          <p>No transactions this month.</p>
         </div>
       </div>
     </div>
-
-    <!-- Insights -->
-    <div class="section-block" id="insights-block" style="display:none;">
-      <div class="sec-label">insights</div>
-      <div id="insights-container"></div>
-    </div>
-
   </div>
-</div>
 
-<!-- TRANSACTIONS SCREEN -->
-<div id="screen-transactions" class="screen">
-  <div class="topbar">
-    <span class="logo">bloom.</span>
-    <button class="month-pill" onclick="openMonthPicker()">
-      <span id="tx-month-label">April 2026</span>
+  <!-- RECURRING SCREEN -->
+  <div id="screen-recurring" class="screen">
+    <div class="topbar"><span class="logo">bloom.</span></div>
+    <div class="scroll-area page-pad">
+      <div class="sec-label">recurring transactions</div>
+      <div id="recurring-list">
+        <div class="empty-state">
+          <div class="empty-icon">🔄</div>
+          <p>No recurring transactions yet.<br>Tap + and mark as recurring.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS SCREEN -->
+  <div id="screen-settings" class="screen">
+    <div class="topbar"><span class="logo">bloom.</span></div>
+    <div class="scroll-area page-pad">
+
+      <div class="section-block">
+        <div class="sec-label">bank connection</div>
+        <div class="card">
+          <div class="settings-row">
+            <div>
+              <div class="settings-label" id="bank-status-label">No bank connected</div>
+              <div class="settings-sub" id="bank-status-sub">Connect MACU to sync transactions</div>
+            </div>
+            <button class="settings-action" id="bank-action-btn" onclick="openPlaidLink()">Connect</button>
+          </div>
+          <div class="settings-row" id="sync-row" style="display:none;">
+            <div>
+              <div class="settings-label">Sync transactions</div>
+              <div class="settings-sub">Pull latest from your bank</div>
+            </div>
+            <button class="settings-action" onclick="syncTransactions()">Sync</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <div class="sec-label">budget goals</div>
+        <div class="card" id="budget-goals-list"></div>
+        <button class="btn-secondary" style="margin-top:10px;" onclick="openBudgetModal()">+ Add budget goal</button>
+      </div>
+
+      <div class="section-block">
+        <div class="sec-label">categories</div>
+        <div class="card" id="categories-list"></div>
+        <button class="btn-secondary" style="margin-top:10px;" onclick="openCategoryModal()">+ Add category</button>
+      </div>
+
+      <div class="section-block">
+        <div class="sec-label">data</div>
+        <div class="card">
+          <div class="settings-row">
+            <div><div class="settings-label">Export data</div><div class="settings-sub">Download all transactions as JSON</div></div>
+            <button class="settings-action" onclick="exportData()">Export</button>
+          </div>
+          <div class="settings-row">
+            <div><div class="settings-label">Import data</div><div class="settings-sub">Restore from a JSON backup</div></div>
+            <button class="settings-action" onclick="document.getElementById('import-file').click()">Import</button>
+          </div>
+          <div class="settings-row">
+            <div><div class="settings-label">Sign out</div><div class="settings-sub">Clear session and return to login</div></div>
+            <button class="settings-action danger" onclick="signOut()">Sign out</button>
+          </div>
+          <div class="settings-row">
+            <div><div class="settings-label">Clear all data</div><div class="settings-sub">Cannot be undone</div></div>
+            <button class="settings-action danger" onclick="clearAllData()">Clear</button>
+          </div>
+        </div>
+        <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(event)">
+      </div>
+
+      <div class="section-block">
+        <div class="sec-label">about</div>
+        <div class="card">
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">bloom. personal budget</div>
+              <div class="settings-sub">Version 2.0 · Secured · Plaid connected</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" id="nav-overview" onclick="switchScreen('overview')">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <rect x="2" y="10" width="5" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="8" y="6" width="5" height="12" rx="1.5" fill="currentColor"/>
+        <rect x="14" y="2" width="5" height="16" rx="1.5" fill="currentColor"/>
+      </svg>
+      <span class="nav-label">overview</span>
     </button>
-  </div>
-  <div class="scroll-area page-pad">
-    <div class="filter-tabs" id="filter-tabs">
-      <button class="filter-tab active" onclick="setFilter('all',this)">All</button>
-      <button class="filter-tab" onclick="setFilter('income',this)">Income</button>
-      <button class="filter-tab" onclick="setFilter('expense',this)">Expenses</button>
-    </div>
-    <div id="tx-list-full">
-      <div class="empty-state">
-        <div class="empty-icon">📋</div>
-        <p>No transactions this month.</p>
-      </div>
-    </div>
-  </div>
+    <button class="nav-item" id="nav-transactions" onclick="switchScreen('transactions')">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M3 10h14M3 5h14M3 15h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span class="nav-label">transactions</span>
+    </button>
+    <button class="fab-btn" onclick="openAddModal()">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M9 3v12M3 9h12" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <button class="nav-item" id="nav-recurring" onclick="switchScreen('recurring')">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M4 10a6 6 0 016-6 6 6 0 014.243 1.757" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M16 10a6 6 0 01-6 6 6 6 0 01-4.243-1.757" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M14 7l2.243-2.243L14 2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M6 13l-2.243 2.243L6 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="nav-label">recurring</span>
+    </button>
+    <button class="nav-item" id="nav-settings" onclick="switchScreen('settings')">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span class="nav-label">settings</span>
+    </button>
+  </nav>
+
 </div>
-
-<!-- RECURRING SCREEN -->
-<div id="screen-recurring" class="screen">
-  <div class="topbar">
-    <span class="logo">bloom.</span>
-  </div>
-  <div class="scroll-area page-pad">
-    <div class="sec-label">recurring transactions</div>
-    <div id="recurring-list">
-      <div class="empty-state">
-        <div class="empty-icon">🔄</div>
-        <p>No recurring transactions yet.<br>Tap + and mark as recurring.</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- SETTINGS SCREEN -->
-<div id="screen-settings" class="screen">
-  <div class="topbar">
-    <span class="logo">bloom.</span>
-  </div>
-  <div class="scroll-area page-pad">
-
-    <div class="section-block">
-      <div class="sec-label">budget goals</div>
-      <div class="card" id="budget-goals-list"></div>
-      <button class="btn-secondary" style="margin-top:10px;" onclick="openBudgetModal()">+ Add budget goal</button>
-    </div>
-
-    <div class="section-block">
-      <div class="sec-label">categories</div>
-      <div class="card" id="categories-list"></div>
-      <button class="btn-secondary" style="margin-top:10px;" onclick="openCategoryModal()">+ Add category</button>
-    </div>
-
-    <div class="section-block">
-      <div class="sec-label">data</div>
-      <div class="card">
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">Export data</div>
-            <div class="settings-sub">Download all transactions as JSON</div>
-          </div>
-          <button class="settings-action" onclick="exportData()">Export</button>
-        </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">Import data</div>
-            <div class="settings-sub">Restore from a JSON backup</div>
-          </div>
-          <button class="settings-action" onclick="document.getElementById('import-file').click()">Import</button>
-        </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">Clear all data</div>
-            <div class="settings-sub">Cannot be undone</div>
-          </div>
-          <button class="settings-action danger" onclick="clearAllData()">Clear</button>
-        </div>
-      </div>
-      <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(event)">
-    </div>
-
-    <div class="section-block">
-      <div class="sec-label">about</div>
-      <div class="card">
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">bloom. personal budget</div>
-            <div class="settings-sub">Version 1.0 · Built for qspencer-4</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- BOTTOM NAV -->
-<nav class="bottom-nav">
-  <button class="nav-item active" id="nav-overview" onclick="switchScreen('overview')">
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <rect x="2" y="10" width="5" height="8" rx="1.5" fill="currentColor"/>
-      <rect x="8" y="6" width="5" height="12" rx="1.5" fill="currentColor"/>
-      <rect x="14" y="2" width="5" height="16" rx="1.5" fill="currentColor"/>
-    </svg>
-    <span class="nav-label">overview</span>
-  </button>
-  <button class="nav-item" id="nav-transactions" onclick="switchScreen('transactions')">
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <path d="M3 10h14M3 5h14M3 15h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-    </svg>
-    <span class="nav-label">transactions</span>
-  </button>
-  <button class="fab-btn" onclick="openAddModal()">
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-      <path d="M9 3v12M3 9h12" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
-    </svg>
-  </button>
-  <button class="nav-item" id="nav-recurring" onclick="switchScreen('recurring')">
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <path d="M4 10a6 6 0 016-6 6 6 0 014.243 1.757" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-      <path d="M16 10a6 6 0 01-6 6 6 6 0 01-4.243-1.757" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-      <path d="M14 7l2.243-2.243L14 2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M6 13l-2.243 2.243L6 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <span class="nav-label">recurring</span>
-  </button>
-  <button class="nav-item" id="nav-settings" onclick="switchScreen('settings')">
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.6"/>
-      <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-    </svg>
-    <span class="nav-label">settings</span>
-  </button>
-</nav>
 
 <!-- ADD TRANSACTION MODAL -->
 <div id="modal-add" class="modal-overlay hidden" onclick="closeModalOnOverlay(event,'modal-add')">
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title" id="add-modal-title">add transaction</div>
-
     <div class="form-group">
       <label class="form-label">Type</label>
       <div style="display:flex;gap:8px;">
@@ -582,7 +708,6 @@
         <button id="type-income" class="filter-tab" onclick="setTxType('income')" style="flex:1;">Income</button>
       </div>
     </div>
-
     <div class="form-group">
       <label class="form-label">Amount</label>
       <div class="amount-wrap">
@@ -590,12 +715,10 @@
         <input type="number" id="tx-amount" class="form-input" placeholder="0.00" step="0.01" min="0">
       </div>
     </div>
-
     <div class="form-group">
       <label class="form-label">Description</label>
       <input type="text" id="tx-desc" class="form-input" placeholder="e.g. Whole Foods, Salary...">
     </div>
-
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Category</label>
@@ -606,7 +729,6 @@
         <input type="date" id="tx-date" class="form-input">
       </div>
     </div>
-
     <div class="form-group">
       <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
         <label class="toggle">
@@ -616,7 +738,6 @@
         <span style="font-size:14px;color:var(--pink-text);">Recurring monthly</span>
       </label>
     </div>
-
     <input type="hidden" id="tx-edit-id">
     <button class="btn-primary" onclick="saveTx()">Save transaction</button>
     <button class="btn-secondary" onclick="closeModal('modal-add')">Cancel</button>
@@ -680,7 +801,186 @@
 </div>
 
 <script>
-// ─── STATE ───────────────────────────────────────────────────────────────────
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const API_BASE = '';
+
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
+let authToken = localStorage.getItem('bloom_token');
+
+async function doLogin() {
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errorEl = document.getElementById('login-error');
+  errorEl.textContent = '';
+
+  if (!username || !password) {
+    errorEl.textContent = 'Please enter your username and password';
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      errorEl.textContent = 'Invalid username or password';
+      return;
+    }
+    authToken = data.token;
+    localStorage.setItem('bloom_token', authToken);
+    showApp();
+  } catch {
+    errorEl.textContent = 'Connection error. Please try again.';
+  }
+}
+
+function signOut() {
+  if (!confirm('Sign out?')) return;
+  localStorage.removeItem('bloom_token');
+  authToken = null;
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').classList.remove('hidden');
+  applyRecurringTransactions();
+  renderOverview();
+  renderSettings();
+  updateBankStatus();
+}
+
+// Check token on load
+if (authToken) {
+  fetch('/api/health', { headers: { 'Authorization': 'Bearer ' + authToken } })
+    .then(r => r.ok ? showApp() : null)
+    .catch(() => null);
+}
+
+// Enter key on login
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none') {
+    doLogin();
+  }
+});
+
+// ─── PLAID ────────────────────────────────────────────────────────────────────
+let plaidConnected = localStorage.getItem('bloom_plaid_connected') === 'true';
+
+async function openPlaidLink() {
+  try {
+    const res = await fetch('/api/plaid/link-token', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + authToken }
+    });
+    const data = await res.json();
+    if (!data.link_token) { showToast('Could not initialize bank connection'); return; }
+
+    const handler = Plaid.create({
+      token: data.link_token,
+      onSuccess: async (public_token, metadata) => {
+        const exchangeRes = await fetch('/api/plaid/exchange-token', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + authToken,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ public_token })
+        });
+        if (exchangeRes.ok) {
+          plaidConnected = true;
+          localStorage.setItem('bloom_plaid_connected', 'true');
+          showToast('Bank connected! Syncing transactions...');
+          updateBankStatus();
+          await syncTransactions();
+        }
+      },
+      onExit: (err) => {
+        if (err) showToast('Connection cancelled');
+      }
+    });
+    handler.open();
+  } catch {
+    showToast('Could not connect to bank service');
+  }
+}
+
+async function syncTransactions() {
+  if (!plaidConnected) { showToast('Connect your bank first'); return; }
+  showToast('Syncing transactions...');
+  try {
+    const res = await fetch('/api/transactions', {
+      headers: { 'Authorization': 'Bearer ' + authToken }
+    });
+    const data = await res.json();
+    if (!data.transactions) { showToast('Sync failed'); return; }
+
+    let added = 0;
+    data.transactions.forEach(pt => {
+      const exists = state.transactions.find(t => t.plaidId === pt.transaction_id);
+      if (!exists) {
+        const catName = pt.category ? pt.category[0] : 'Other';
+        const cat = state.categories.find(c => c.name.toLowerCase() === catName.toLowerCase())
+          || state.categories.find(c => c.name === 'Other')
+          || state.categories[0];
+        state.transactions.unshift({
+          id: genId(),
+          plaidId: pt.transaction_id,
+          type: pt.amount > 0 ? 'expense' : 'income',
+          amount: Math.abs(pt.amount),
+          description: pt.name,
+          category: cat ? cat.id : state.categories[0].id,
+          date: pt.date,
+          recurring: false,
+          fromPlaid: true
+        });
+        added++;
+      }
+    });
+
+    save('transactions', state.transactions);
+    localStorage.setItem('bloom_last_sync', new Date().toLocaleString());
+    showToast(added > 0 ? `Synced ${added} new transactions!` : 'Already up to date');
+    renderOverview();
+    renderTransactions();
+    updateBankStatus();
+  } catch {
+    showToast('Sync failed — check connection');
+  }
+}
+
+function updateBankStatus() {
+  const connected = plaidConnected;
+  const lastSync = localStorage.getItem('bloom_last_sync');
+
+  // Banner on overview
+  const banner = document.getElementById('plaid-connect-banner');
+  if (banner) banner.style.display = connected ? 'none' : 'flex';
+
+  // Sync status row
+  const dot = document.getElementById('sync-dot');
+  const statusText = document.getElementById('sync-status-text');
+  const syncBtn = document.getElementById('sync-btn');
+  if (dot) dot.className = 'sync-dot' + (connected ? '' : ' disconnected');
+  if (statusText) statusText.textContent = connected ? ('Last synced: ' + (lastSync || 'never')) : 'Bank not connected';
+  if (syncBtn) syncBtn.classList.toggle('hidden', !connected);
+
+  // Settings
+  const bankLabel = document.getElementById('bank-status-label');
+  const bankSub = document.getElementById('bank-status-sub');
+  const bankBtn = document.getElementById('bank-action-btn');
+  const syncRow = document.getElementById('sync-row');
+  if (bankLabel) bankLabel.textContent = connected ? 'MACU connected' : 'No bank connected';
+  if (bankSub) bankSub.textContent = connected ? ('Last sync: ' + (lastSync || 'never')) : 'Connect MACU to sync transactions';
+  if (bankBtn) { bankBtn.textContent = connected ? 'Reconnect' : 'Connect'; }
+  if (syncRow) syncRow.style.display = connected ? 'flex' : 'none';
+}
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
 const DEFAULT_CATEGORIES = [
   {id:'cat-1', name:'Housing', emoji:'🏠'},
   {id:'cat-2', name:'Groceries', emoji:'🛒'},
@@ -699,9 +999,7 @@ const EMOJIS = ['🏠','🛒','🚗','🍜','🎬','💊','🛍️','💼','💻
 function load(key, def) {
   try { return JSON.parse(localStorage.getItem('bloom_'+key)) ?? def; } catch { return def; }
 }
-function save(key, val) {
-  localStorage.setItem('bloom_'+key, JSON.stringify(val));
-}
+function save(key, val) { localStorage.setItem('bloom_'+key, JSON.stringify(val)); }
 
 let state = {
   transactions: load('transactions', []),
@@ -717,31 +1015,20 @@ let selectedEmoji = '📦';
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 const fmt = (n) => new Intl.NumberFormat('en-US', {style:'currency', currency:'USD'}).format(n);
-const fmtShort = (n) => {
-  if (n >= 1000) return '$' + (n/1000).toFixed(1) + 'k';
-  return '$' + Math.round(n);
-};
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const SHORT_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
 function monthLabel(y, m) { return MONTH_NAMES[m] + ' ' + y; }
-
 function txInMonth(tx, year, month) {
   const d = new Date(tx.date + 'T00:00:00');
   return d.getFullYear() === year && d.getMonth() === month;
 }
-
-function getCat(id) {
-  return state.categories.find(c => c.id === id) || {name:'Other', emoji:'📦'};
-}
-
+function getCat(id) { return state.categories.find(c => c.id === id) || {name:'Other', emoji:'📦'}; }
 function genId() { return 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2,7); }
-
 function showToast(msg) {
   const t = document.createElement('div');
   t.className = 'toast'; t.textContent = msg;
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 2200);
+  setTimeout(() => t.remove(), 2400);
 }
 
 // ─── NAVIGATION ──────────────────────────────────────────────────────────────
@@ -792,7 +1079,6 @@ function closeModalOnOverlay(e, id) {
 function openAddModal(editId) {
   document.getElementById('tx-edit-id').value = editId || '';
   document.getElementById('add-modal-title').textContent = editId ? 'edit transaction' : 'add transaction';
-
   if (editId) {
     const tx = state.transactions.find(t => t.id === editId);
     if (!tx) return;
@@ -834,11 +1120,9 @@ function saveTx() {
   const date = document.getElementById('tx-date').value;
   const recurring = document.getElementById('tx-recurring').checked;
   const editId = document.getElementById('tx-edit-id').value;
-
   if (!amount || amount <= 0) { showToast('Please enter a valid amount'); return; }
   if (!desc) { showToast('Please add a description'); return; }
   if (!date) { showToast('Please select a date'); return; }
-
   if (editId) {
     const idx = state.transactions.findIndex(t => t.id === editId);
     if (idx >= 0) state.transactions[idx] = {id:editId, type:currentTxType, amount, description:desc, category, date, recurring};
@@ -856,9 +1140,7 @@ function saveTx() {
 function deleteTx(id) {
   state.transactions = state.transactions.filter(t => t.id !== id);
   save('transactions', state.transactions);
-  renderOverview();
-  renderTransactions();
-  renderRecurring();
+  renderOverview(); renderTransactions(); renderRecurring();
   showToast('Transaction deleted');
 }
 
@@ -881,7 +1163,6 @@ function saveBudget() {
   const limit = parseFloat(document.getElementById('budget-amount').value);
   const editId = document.getElementById('budget-edit-id').value;
   if (!limit || limit <= 0) { showToast('Please enter a valid amount'); return; }
-
   if (editId) {
     const idx = state.budgets.findIndex(b => b.id === editId);
     if (idx >= 0) state.budgets[idx] = {id:editId, category, limit};
@@ -893,37 +1174,28 @@ function saveBudget() {
   save('budgets', state.budgets);
   closeModal('modal-budget');
   showToast('Budget saved');
-  renderSettings();
-  renderOverview();
+  renderSettings(); renderOverview();
 }
 
 function deleteBudget(id) {
   state.budgets = state.budgets.filter(b => b.id !== id);
   save('budgets', state.budgets);
-  renderSettings();
-  renderOverview();
+  renderSettings(); renderOverview();
   showToast('Budget removed');
 }
 
 // ─── CATEGORY MODAL ──────────────────────────────────────────────────────────
 function openCategoryModal() {
   document.getElementById('cat-name').value = '';
-  selectedEmoji = '📦';
-  renderEmojiGrid();
+  selectedEmoji = '📦'; renderEmojiGrid();
   openModal('modal-category');
 }
-
 function renderEmojiGrid() {
   document.getElementById('emoji-grid').innerHTML = EMOJIS.map(e =>
     `<button class="emoji-btn ${e===selectedEmoji?'selected':''}" onclick="selectEmoji('${e}')">${e}</button>`
   ).join('');
 }
-
-function selectEmoji(e) {
-  selectedEmoji = e;
-  renderEmojiGrid();
-}
-
+function selectEmoji(e) { selectedEmoji = e; renderEmojiGrid(); }
 function saveCategory() {
   const name = document.getElementById('cat-name').value.trim();
   if (!name) { showToast('Please enter a category name'); return; }
@@ -933,12 +1205,10 @@ function saveCategory() {
   showToast('Category added');
   renderSettings();
 }
-
 function deleteCategory(id) {
   state.categories = state.categories.filter(c => c.id !== id);
   save('categories', state.categories);
-  renderSettings();
-  renderOverview();
+  renderSettings(); renderOverview();
   showToast('Category removed');
 }
 
@@ -953,16 +1223,12 @@ function setFilter(f, btn) {
 // ─── RENDER OVERVIEW ─────────────────────────────────────────────────────────
 function renderOverview() {
   const {year, month} = state.currentMonth;
-  const lbl = monthLabel(year, month);
-  document.getElementById('overview-month-label').textContent = lbl;
-
+  document.getElementById('overview-month-label').textContent = monthLabel(year, month);
   const monthTx = state.transactions.filter(tx => txInMonth(tx, year, month));
   const income = monthTx.filter(t => t.type === 'income').reduce((s,t) => s+t.amount, 0);
   const spent = monthTx.filter(t => t.type === 'expense').reduce((s,t) => s+t.amount, 0);
   const saved = Math.max(0, income - spent);
   const balance = income - spent;
-
-  // Hero
   const balFmt = fmt(Math.abs(balance));
   const parts = balFmt.replace('$','').split('.');
   document.getElementById('hero-balance').innerHTML =
@@ -971,34 +1237,23 @@ function renderOverview() {
   document.getElementById('hero-income').textContent = fmt(income);
   document.getElementById('hero-spent').textContent = fmt(spent);
   document.getElementById('hero-saved').textContent = fmt(saved);
-
-  // Budget bars
   renderBudgetBars(monthTx);
-
-  // Chart
   renderSpendingChart(year, month);
-
-  // Donut
   renderDonut(monthTx);
-
-  // Recent transactions (last 5)
   const recentEl = document.getElementById('recent-tx-list');
   const recent = monthTx.slice(0,5);
   if (!recent.length) {
-    recentEl.innerHTML = `<div class="empty-state"><div class="empty-icon">✨</div><p>No transactions yet.<br>Tap + to add your first one.</p></div>`;
+    recentEl.innerHTML = `<div class="empty-state"><div class="empty-icon">✨</div><p>No transactions yet.<br>Tap + to add one or connect your bank.</p></div>`;
   } else {
     recentEl.innerHTML = recent.map(tx => txRowHTML(tx)).join('');
   }
-
-  // Insights
   renderInsights(monthTx, income, spent);
 }
 
 function renderBudgetBars(monthTx) {
   const container = document.getElementById('budget-bars-container');
-  const empty = document.getElementById('budget-empty');
   if (!state.budgets.length) {
-    container.innerHTML = `<div class="empty-state" id="budget-empty"><div class="empty-icon">🎯</div><p>No budget goals yet.<br>Add one in the Settings tab.</p></div>`;
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">🎯</div><p>No budget goals yet.<br>Add one in the Settings tab.</p></div>`;
     return;
   }
   container.innerHTML = state.budgets.map(b => {
@@ -1028,12 +1283,10 @@ function renderSpendingChart(curYear, curMonth) {
     state.transactions.filter(t => t.type==='expense' && txInMonth(t,year,month)).reduce((s,t)=>s+t.amount,0)
   );
   const max = Math.max(...totals, 1);
-
   document.getElementById('spending-chart').innerHTML = months.map(({month}, i) => {
     const h = Math.max(4, Math.round((totals[i]/max)*68));
-    const isCurrent = i === 5;
     return `<div class="bc-col">
-      <div class="bc-bar" style="height:${h}px;background:${isCurrent?'var(--pink)':'#F4C0D1'};"></div>
+      <div class="bc-bar" style="height:${h}px;background:${i===5?'var(--pink)':'#F4C0D1'};"></div>
       <span class="bc-label">${SHORT_MONTHS[month]}</span>
     </div>`;
   }).join('');
@@ -1047,26 +1300,19 @@ function renderDonut(monthTx) {
     document.getElementById('donut-legend').innerHTML = `<div style="font-size:12px;color:var(--pink-muted);">Add expenses to see breakdown</div>`;
     return;
   }
-
   const byCategory = {};
-  expenses.forEach(t => {
-    byCategory[t.category] = (byCategory[t.category]||0) + t.amount;
-  });
-
+  expenses.forEach(t => { byCategory[t.category] = (byCategory[t.category]||0) + t.amount; });
   const sorted = Object.entries(byCategory).sort((a,b)=>b[1]-a[1]).slice(0,5);
   const COLORS = ['#ED93B1','#F4C0D1','#D4537E','#993556','#FADADD'];
   const circum = 2 * Math.PI * 35;
-
   let offset = -circum * 0.25;
   let circles = `<circle cx="45" cy="45" r="35" fill="none" stroke="#FADADD" stroke-width="14"/>`;
   let legendHTML = '';
-
   sorted.forEach(([catId, amt], i) => {
     const cat = getCat(catId);
     const pct = amt / total;
     const dash = pct * circum;
-    const gap = circum - dash;
-    circles += `<circle cx="45" cy="45" r="35" fill="none" stroke="${COLORS[i]}" stroke-width="14" stroke-dasharray="${dash.toFixed(2)} ${gap.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}"/>`;
+    circles += `<circle cx="45" cy="45" r="35" fill="none" stroke="${COLORS[i]}" stroke-width="14" stroke-dasharray="${dash.toFixed(2)} ${(circum-dash).toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}"/>`;
     offset -= dash;
     legendHTML += `<div class="legend-row">
       <div class="legend-dot" style="background:${COLORS[i]};"></div>
@@ -1074,7 +1320,6 @@ function renderDonut(monthTx) {
       <span class="legend-pct">${Math.round(pct*100)}%</span>
     </div>`;
   });
-
   document.getElementById('donut-svg').innerHTML = circles;
   document.getElementById('donut-legend').innerHTML = legendHTML;
 }
@@ -1083,22 +1328,19 @@ function renderInsights(monthTx, income, spent) {
   const block = document.getElementById('insights-block');
   const container = document.getElementById('insights-container');
   const insights = [];
-
   if (spent > income && income > 0) {
-    insights.push({title:'⚠️ Spending exceeds income', body:`You've spent ${fmt(spent-income)} more than you earned this month. Consider reviewing your expenses.`});
+    insights.push({title:'⚠️ Spending exceeds income', body:`You've spent ${fmt(spent-income)} more than you earned this month.`});
   }
   const overBudgets = state.budgets.filter(b => {
     const s = monthTx.filter(t=>t.type==='expense'&&t.category===b.category).reduce((a,t)=>a+t.amount,0);
     return s > b.limit;
   });
   if (overBudgets.length) {
-    const cats = overBudgets.map(b=>getCat(b.category).name).join(', ');
-    insights.push({title:'📊 Over budget', body:`You've exceeded your budget in: ${cats}.`});
+    insights.push({title:'📊 Over budget', body:`Exceeded budget in: ${overBudgets.map(b=>getCat(b.category).name).join(', ')}.`});
   }
   if (income > 0 && spent < income * 0.5) {
-    insights.push({title:'🌸 Great saving!', body:`You've only spent ${Math.round((spent/income)*100)}% of your income this month. Keep it up!`});
+    insights.push({title:'🌸 Great saving!', body:`Only spent ${Math.round((spent/income)*100)}% of income this month!`});
   }
-
   if (!insights.length) { block.style.display = 'none'; return; }
   block.style.display = 'block';
   container.innerHTML = insights.map(ins =>
@@ -1110,24 +1352,17 @@ function renderInsights(monthTx, income, spent) {
 function renderTransactions() {
   const {year, month} = state.currentMonth;
   document.getElementById('tx-month-label').textContent = monthLabel(year, month);
-
   let monthTx = state.transactions.filter(tx => txInMonth(tx, year, month));
   if (txFilter === 'income') monthTx = monthTx.filter(t => t.type==='income');
   if (txFilter === 'expense') monthTx = monthTx.filter(t => t.type==='expense');
-
+  if (txFilter === 'plaid') monthTx = monthTx.filter(t => t.fromPlaid);
   const el = document.getElementById('tx-list-full');
   if (!monthTx.length) {
     el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>No transactions this month.</p></div>`;
     return;
   }
-
-  // Group by date
   const grouped = {};
-  monthTx.forEach(tx => {
-    if (!grouped[tx.date]) grouped[tx.date] = [];
-    grouped[tx.date].push(tx);
-  });
-
+  monthTx.forEach(tx => { if (!grouped[tx.date]) grouped[tx.date] = []; grouped[tx.date].push(tx); });
   const sorted = Object.keys(grouped).sort((a,b) => b.localeCompare(a));
   el.innerHTML = sorted.map(date => {
     const d = new Date(date + 'T00:00:00');
@@ -1138,11 +1373,10 @@ function renderTransactions() {
         <span style="font-size:12px;font-weight:500;color:var(--pink-muted);">${label}</span>
         <span style="font-size:12px;color:${dayTotal>=0?'var(--green)':'var(--pink-dark)'};">${dayTotal>=0?'+':''}${fmt(dayTotal)}</span>
       </div>
-      <div class="card" style="padding:4px 14px;">
-        ${grouped[date].map(tx => txRowHTML(tx)).join('')}
-      </div>
+      <div class="card" style="padding:4px 14px;">${grouped[date].map(tx => txRowHTML(tx)).join('')}</div>
     </div>`;
   }).join('');
+  updateBankStatus();
 }
 
 function txRowHTML(tx) {
@@ -1151,11 +1385,11 @@ function txRowHTML(tx) {
   return `<div class="tx-row">
     <div class="tx-icon">${cat.emoji}</div>
     <div style="flex:1;min-width:0;">
-      <div class="tx-name">${tx.description}${tx.recurring?`<span class="recur-badge">recurring</span>`:''}</div>
+      <div class="tx-name">${tx.description}${tx.recurring?'<span class="recur-badge">recurring</span>':''}${tx.fromPlaid?'<span class="plaid-badge">bank</span>':''}</div>
       <div class="tx-sub">${cat.name} · ${new Date(tx.date+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
     </div>
     <div class="tx-amt" style="color:${isIncome?'var(--green)':'var(--pink-dark)'};">${isIncome?'+':'−'}${fmt(tx.amount)}</div>
-    <button class="tx-del" onclick="deleteTx('${tx.id}')" title="Delete">
+    <button class="tx-del" onclick="deleteTx('${tx.id}')">
       <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2l8 8M10 2l-8 8" stroke="var(--pink-dark)" stroke-width="1.5" stroke-linecap="round"/></svg>
     </button>
   </div>`;
@@ -1166,7 +1400,7 @@ function renderRecurring() {
   const recurring = state.transactions.filter(t => t.recurring);
   const el = document.getElementById('recurring-list');
   if (!recurring.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🔄</div><p>No recurring transactions yet.<br>Tap + and mark as recurring.</p></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🔄</div><p>No recurring transactions yet.</p></div>`;
     return;
   }
   const unique = [];
@@ -1180,7 +1414,6 @@ function renderRecurring() {
 
 // ─── RENDER SETTINGS ─────────────────────────────────────────────────────────
 function renderSettings() {
-  // Budget goals
   const budgetEl = document.getElementById('budget-goals-list');
   if (!state.budgets.length) {
     budgetEl.innerHTML = `<div style="padding:12px;font-size:13px;color:var(--pink-muted);">No budget goals yet.</div>`;
@@ -1196,26 +1429,18 @@ function renderSettings() {
       </div>`;
     }).join('');
   }
-
-  // Categories
-  const catEl = document.getElementById('categories-list');
-  catEl.innerHTML = state.categories.map(c =>
+  document.getElementById('categories-list').innerHTML = state.categories.map(c =>
     `<div class="settings-row">
       <div class="settings-label">${c.emoji} ${c.name}</div>
       <button class="settings-action danger" onclick="deleteCategory('${c.id}')">Remove</button>
     </div>`
   ).join('');
+  updateBankStatus();
 }
 
 // ─── DATA EXPORT / IMPORT ────────────────────────────────────────────────────
 function exportData() {
-  const data = {
-    transactions: state.transactions,
-    categories: state.categories,
-    budgets: state.budgets,
-    exportedAt: new Date().toISOString(),
-    version: '1.0'
-  };
+  const data = { transactions: state.transactions, categories: state.categories, budgets: state.budgets, exportedAt: new Date().toISOString(), version: '2.0' };
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1239,12 +1464,9 @@ function importData(event) {
       save('transactions', state.transactions);
       save('categories', state.categories);
       save('budgets', state.budgets);
-      renderOverview();
-      renderSettings();
+      renderOverview(); renderSettings();
       showToast('Data imported!');
-    } catch {
-      showToast('Invalid backup file');
-    }
+    } catch { showToast('Invalid backup file'); }
   };
   reader.readAsText(file);
   event.target.value = '';
@@ -1252,22 +1474,20 @@ function importData(event) {
 
 function clearAllData() {
   if (!confirm('Delete ALL data? This cannot be undone.')) return;
-  state.transactions = [];
-  state.budgets = [];
-  state.categories = DEFAULT_CATEGORIES;
+  state.transactions = []; state.budgets = []; state.categories = DEFAULT_CATEGORIES;
   save('transactions', state.transactions);
   save('budgets', state.budgets);
   save('categories', state.categories);
-  renderOverview();
-  renderSettings();
+  localStorage.removeItem('bloom_plaid_connected');
+  localStorage.removeItem('bloom_last_sync');
+  plaidConnected = false;
+  renderOverview(); renderSettings();
   showToast('All data cleared');
 }
 
 // ─── RECURRING AUTO-ADD ───────────────────────────────────────────────────────
 function applyRecurringTransactions() {
   const {year, month} = state.currentMonth;
-  const today = new Date().toISOString().slice(0,10);
-
   const recurring = state.transactions.filter(t => t.recurring);
   const unique = [];
   const seen = new Set();
@@ -1275,44 +1495,19 @@ function applyRecurringTransactions() {
     const key = t.description + '|' + t.category + '|' + t.type;
     if (!seen.has(key)) { seen.add(key); unique.push(t); }
   });
-
   let added = 0;
   unique.forEach(rt => {
     const targetDate = `${year}-${String(month+1).padStart(2,'0')}-01`;
     const alreadyExists = state.transactions.some(t =>
-      t.recurring && t.description === rt.description &&
-      t.category === rt.category && txInMonth(t, year, month)
+      t.recurring && t.description === rt.description && t.category === rt.category && txInMonth(t, year, month)
     );
     if (!alreadyExists) {
-      state.transactions.unshift({
-        id: genId(), type: rt.type, amount: rt.amount,
-        description: rt.description, category: rt.category,
-        date: targetDate, recurring: true, autoAdded: true
-      });
+      state.transactions.unshift({ id: genId(), type: rt.type, amount: rt.amount, description: rt.description, category: rt.category, date: targetDate, recurring: true, autoAdded: true });
       added++;
     }
   });
-
-  if (added > 0) {
-    save('transactions', state.transactions);
-  }
+  if (added > 0) save('transactions', state.transactions);
 }
-
-// ─── PWA SERVICE WORKER ──────────────────────────────────────────────────────
-if ('serviceWorker' in navigator) {
-  const swCode = `
-    const CACHE = 'bloom-v1';
-    self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./', './index.html']))));
-    self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))));
-  `;
-  const blob = new Blob([swCode], {type:'application/javascript'});
-  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
-}
-
-// ─── INIT ────────────────────────────────────────────────────────────────────
-applyRecurringTransactions();
-renderOverview();
-renderSettings();
 </script>
 </body>
-</html> 
+</html>
